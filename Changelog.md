@@ -47,5 +47,7 @@
 **🖥️ Windows**
 
 - 优化 Windows 服务安全检查未通过时的提示：启动、安装或修复服务时说明原因与内核占用，并提供处理方法
+- Use `verge-mohomi` and `verge-mohomi-alpha` cores on Windows x64.
+- Disable upstream application updates for the Windows x64 local fork.
 
 </details>

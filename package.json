@@ -11,6 +11,7 @@
     "dev:trace": "node scripts/dev.mjs trace",
     "dev:tauri": "cross-env RUST_BACKTRACE=full tauri dev -f tauri-dev",
     "build": "cross-env NODE_OPTIONS='--max-old-space-size=4096' tauri build",
+    "build:windows-x64": "pnpm prebuild x86_64-pc-windows-msvc && pnpm build --target x86_64-pc-windows-msvc --config src-tauri/tauri.mohomi.conf.json -- --locked",
     "build:fast": "cross-env NODE_OPTIONS='--max-old-space-size=4096' tauri build -- --profile fast-release",
     "tauri": "tauri",
     "web:dev": "vite",

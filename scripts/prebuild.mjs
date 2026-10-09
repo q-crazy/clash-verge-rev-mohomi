@@ -64,6 +64,9 @@ const SIDECAR_HOST = target
       .toString()
       .match(/(?<=host: ).+(?=\s*)/g)[0]
 
+const CORE_STEM =
+  SIDECAR_HOST === 'x86_64-pc-windows-msvc' ? 'verge-mohomi' : 'verge-mihomo'
+
 const RESOURCES_DIR = path.join(cwd, 'src-tauri', 'resources')
 const SIDECAR_DIR = path.join(cwd, 'src-tauri', 'sidecar')
 // Linux service binaries are bundled as externalBin sidecars (see tauri.linux.conf.json)
@@ -277,8 +280,8 @@ function clashMetaAlpha() {
   const isWin = platform === 'win32'
   const urlExt = isWin ? 'zip' : 'gz'
   return {
-    name: 'verge-mihomo-alpha',
-    targetFile: `verge-mihomo-alpha-${SIDECAR_HOST}${isWin ? '.exe' : ''}`,
+    name: `${CORE_STEM}-alpha`,
+    targetFile: `${CORE_STEM}-alpha-${SIDECAR_HOST}${isWin ? '.exe' : ''}`,
     exeFile: `${name}${isWin ? '.exe' : ''}`,
     zipFile: `${name}-${META_ALPHA_VERSION}.${urlExt}`,
     downloadURL: `${META_ALPHA_URL_PREFIX}/${name}-${META_ALPHA_VERSION}.${urlExt}`,
@@ -290,8 +293,8 @@ function clashMeta() {
   const isWin = platform === 'win32'
   const urlExt = isWin ? 'zip' : 'gz'
   return {
-    name: 'verge-mihomo',
-    targetFile: `verge-mihomo-${SIDECAR_HOST}${isWin ? '.exe' : ''}`,
+    name: CORE_STEM,
+    targetFile: `${CORE_STEM}-${SIDECAR_HOST}${isWin ? '.exe' : ''}`,
     exeFile: `${name}${isWin ? '.exe' : ''}`,
     zipFile: `${name}-${META_VERSION}.${urlExt}`,
     downloadURL: `${META_URL_PREFIX}/${META_VERSION}/${name}-${META_VERSION}.${urlExt}`,
@@ -604,6 +607,7 @@ async function resolveServiceBundle() {
         '--target',
         SIDECAR_HOST,
         '--release',
+        '--locked',
         '--features',
         'standalone,client',
         '--bins',
@@ -679,8 +683,8 @@ const CORE_HASHES_NSH = path.join(
 async function resolveCoreHashes() {
   const lines = []
   for (const [define, name] of [
-    ['MIHOMO_SHA256', 'verge-mihomo'],
-    ['MIHOMO_ALPHA_SHA256', 'verge-mihomo-alpha'],
+    ['MIHOMO_SHA256', CORE_STEM],
+    ['MIHOMO_ALPHA_SHA256', `${CORE_STEM}-alpha`],
   ]) {
     const sidecar = path.join(SIDECAR_DIR, `${name}-${SIDECAR_HOST}.exe`)
     const digest = createHash('sha256')

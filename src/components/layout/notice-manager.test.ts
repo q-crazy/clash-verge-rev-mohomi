@@ -21,6 +21,8 @@ vi.mock('react', async (importOriginal) => ({
 }))
 vi.mock('@/utils/open-external-url', () => ({ openExternalUrl: vi.fn() }))
 
+let sidecarRevision = 0
+
 afterEach(() => {
   getSnapshotNotices().forEach(({ id }) => hideNotice(id))
 })
@@ -38,6 +40,18 @@ it.each([
     'sidecar',
     'Service core rejected: permission denied; Sidecar fallback failed: process verge-mihomo.exe (PID 123) is still running; refusing a second core',
   ],
+  [
+    'startup',
+    'process verge-mohomi.exe (PID 321) is still running; refusing a second core',
+  ],
+  [
+    'restart',
+    'process verge-mohomi-alpha.exe remains after IPC failure; refusing a second core',
+  ],
+  [
+    'sidecar',
+    'Service core rejected: permission denied; Sidecar fallback failed: process verge-mohomi-alpha.exe (PID 123) is still running; refusing a second core',
+  ],
 ])(
   'explains an occupied core during %s and preserves diagnostics',
   async (operation, detail) => {
@@ -46,7 +60,7 @@ it.each([
     } else if (operation === 'restart') {
       showNotice.error({ code: 'CORE_RESTART_FAILED', detail })
     } else {
-      syncSidecarFailure({ revision: 1, detail })
+      syncSidecarFailure({ revision: ++sidecarRevision, detail })
     }
     const i18n = createInstance()
     await i18n.init({

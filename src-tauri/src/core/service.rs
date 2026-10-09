@@ -4,7 +4,7 @@ use crate::{
     config::{Config, runtime::IRuntime},
     constants,
     core::{
-        CoreManager,
+        CoreManager, executable_core_name,
         handle::Handle,
         manager::{CoreFailure, RunningMode},
         owner_identity::current_owner_credentials,
@@ -542,13 +542,14 @@ fn macos_service_tool_path(source: &Path) -> Result<PathBuf> {
 }
 
 fn service_core_path(clash_core: &str, bin_ext: &str) -> Result<PathBuf> {
+    let executable_core = executable_core_name(clash_core);
     let sibling = current_exe()
         .map_err(|error| {
             anyhow::anyhow!(
                 "failed to locate the current executable while resolving Service core {clash_core:?}: {error}"
             )
         })?
-        .with_file_name(format!("{clash_core}{bin_ext}"));
+        .with_file_name(format!("{executable_core}{bin_ext}"));
 
     #[cfg(all(target_os = "macos", feature = "verge-dev"))]
     {
@@ -726,7 +727,7 @@ fn install_service() -> Result<()> {
     let cores = crate::config::IVerge::VALID_CLASH_CORES
         .iter()
         .map(|core| {
-            let name = format!("{core}{}", std::env::consts::EXE_SUFFIX);
+            let name = format!("{}{}", executable_core_name(core), std::env::consts::EXE_SUFFIX);
             clash_verge_service_ipc::management::CoreSource {
                 path: executable.with_file_name(&name),
                 name,
@@ -2070,6 +2071,20 @@ mod tests {
         path::{Path, PathBuf},
         sync::atomic::{AtomicU64, Ordering},
     };
+
+    #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+    #[test]
+    fn service_launch_resolves_the_renamed_windows_executables() -> anyhow::Result<()> {
+        assert_eq!(
+            super::service_core_path("verge-mihomo", ".exe")?.file_name(),
+            Some(std::ffi::OsStr::new("verge-mohomi.exe"))
+        );
+        assert_eq!(
+            super::service_core_path("verge-mihomo-alpha", ".exe")?.file_name(),
+            Some(std::ffi::OsStr::new("verge-mohomi-alpha.exe"))
+        );
+        Ok(())
+    }
 
     /// A Run State backed by a scripted environment, so these tests never touch the global.
     fn fake_store() -> RunStateStore<FakeEnv> {

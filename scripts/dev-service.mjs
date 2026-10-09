@@ -8,7 +8,7 @@ export const developmentServiceDirectoryEnvironment =
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const serviceRepository = resolve(
   repositoryRoot,
-  '..',
+  'vendor',
   'clash-verge-service-ipc',
 )
 const serviceManifest = join(serviceRepository, 'Cargo.toml')
@@ -114,7 +114,9 @@ export async function ensureDevelopmentService({
   )?.[1]
   if (!host) throw new Error('rustc did not report its host target')
   const args = ['--prepare-install', '--ensure']
-  for (const name of ['verge-mihomo', 'verge-mihomo-alpha']) {
+  const coreStem =
+    host === 'x86_64-pc-windows-msvc' ? 'verge-mohomi' : 'verge-mihomo'
+  for (const name of [coreStem, `${coreStem}-alpha`]) {
     args.push(
       '--core',
       `${name}${extension}`,

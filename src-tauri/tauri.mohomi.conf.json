@@ -1,0 +1,6 @@
+{
+  "bundle": {
+    "externalBin": ["sidecar/verge-mohomi", "sidecar/verge-mohomi-alpha"],
+    "createUpdaterArtifacts": false
+  }
+}

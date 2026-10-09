@@ -24,3 +24,15 @@ pub mod win_uwp;
 
 pub use self::{manager::CoreManager, timer::Timer, updater::SilentUpdater};
 pub use notify::{handle, notification};
+
+pub(crate) fn executable_core_name(core: &str) -> &str {
+    if cfg!(all(target_os = "windows", target_arch = "x86_64")) {
+        match core {
+            "verge-mihomo" => "verge-mohomi",
+            "verge-mihomo-alpha" => "verge-mohomi-alpha",
+            _ => core,
+        }
+    } else {
+        core
+    }
+}

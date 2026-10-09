@@ -28,6 +28,9 @@ export function buildTauriInvocation(
   const env = { ...environment, RUST_BACKTRACE: 'full' }
   const features = mode === 'sidecar' ? 'verge-dev,dev-sidecar' : 'verge-dev'
   const args = ['exec', 'tauri', 'dev', '-f', features]
+  if (platform === 'win32' && process.arch === 'x64') {
+    args.push('--config', 'src-tauri/tauri.mohomi.conf.json')
+  }
   if (mode === 'trace') {
     env.RUSTFLAGS = '--cfg tokio_unstable'
     args.push('tokio-trace')

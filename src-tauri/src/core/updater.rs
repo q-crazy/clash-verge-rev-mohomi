@@ -330,7 +330,9 @@ impl SilentUpdater {
 
     /// Installs a newer cached update before normal startup, if the user confirms.
     pub async fn try_install_on_startup(&self, app_handle: &tauri::AppHandle) -> bool {
-        if !Config::verge().await.latest_arc().auto_check_update.unwrap_or(true) {
+        if cfg!(all(windows, target_arch = "x86_64"))
+            || !Config::verge().await.latest_arc().auto_check_update.unwrap_or(true)
+        {
             Self::delete_cache();
             return false;
         }
@@ -598,7 +600,7 @@ impl SilentUpdater {
         let cancel = CancellationToken::new();
         *self.background_cancel.lock() = Some(cancel.clone());
         let auto_check = Config::verge().await.latest_arc().auto_check_update.unwrap_or(true);
-        if !auto_check {
+        if cfg!(all(windows, target_arch = "x86_64")) || !auto_check {
             logging!(debug, Type::System, "Silent update skipped: auto_check_update is false");
             return Ok(());
         }
